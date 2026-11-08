@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="320" viewBox="0 0 720 320">
+<defs>
+<linearGradient id="night" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#05121d"/><stop offset=".55" stop-color="#082d2a"/><stop offset="1" stop-color="#03120e"/></linearGradient>
+<linearGradient id="pitch" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#24764b"/><stop offset="1" stop-color="#082d1f"/></linearGradient>
+<radialGradient id="light"><stop stop-color="#ffec9e" stop-opacity=".88"/><stop offset=".19" stop-color="#d8dbae" stop-opacity=".33"/><stop offset="1" stop-color="#d9fbff" stop-opacity="0"/></radialGradient>
+<linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#021610" stop-opacity="0"/><stop offset="1" stop-color="#021610"/></linearGradient>
+</defs>
+<rect width="720" height="320" fill="url(#night)"/>
+<path d="M-60 65 Q360 -90 780 65" fill="none" stroke="#465b66" stroke-width="15"/>
+<path d="M-50 82 Q360 -65 770 82" fill="none" stroke="#c2aa68" stroke-width="2" opacity=".65"/>
+<path d="M-20 96 Q360 -19 740 96 L740 232 Q365 155 -20 232Z" fill="#0b1d24" stroke="#5b6b54" stroke-width="4"/>
+<path d="M-10 112 Q360 15 730 112 M-10 135 Q360 48 730 135 M-10 158 Q360 79 730 158" fill="none" stroke="#cbac5f" stroke-width="3" opacity=".2"/>
+<g fill="#e6aa51" opacity=".62">
+<circle cx="54" cy="130" r="2"/><circle cx="79" cy="135" r="2"/><circle cx="103" cy="141" r="2"/><circle cx="132" cy="152" r="2"/><circle cx="155" cy="158" r="2"/><circle cx="198" cy="161" r="2"/><circle cx="250" cy="169" r="2"/><circle cx="301" cy="173" r="2"/><circle cx="359" cy="175" r="2"/><circle cx="408" cy="174" r="2"/><circle cx="459" cy="168" r="2"/><circle cx="508" cy="163" r="2"/><circle cx="561" cy="151" r="2"/><circle cx="617" cy="141" r="2"/><circle cx="666" cy="131" r="2"/>
+</g>
+<ellipse cx="105" cy="54" rx="180" ry="118" fill="url(#light)"/>
+<ellipse cx="610" cy="54" rx="180" ry="118" fill="url(#light)"/>
+<g stroke="#fff5c8" stroke-width="6" stroke-linecap="round">
+<path d="M53 40h102M565 40h102"/>
+</g>
+<g fill="#fff5c8">
+<circle cx="60" cy="40" r="5"/><circle cx="89" cy="40" r="5"/><circle cx="120" cy="40" r="5"/><circle cx="149" cy="40" r="5"/>
+<circle cx="571" cy="40" r="5"/><circle cx="603" cy="40" r="5"/><circle cx="631" cy="40" r="5"/><circle cx="660" cy="40" r="5"/>
+</g>
+<path d="M-30 245 Q360 135 750 245 L750 320H-30Z" fill="url(#pitch)" stroke="#7db17b" stroke-width="3"/>
+<path d="M0 285 Q360 180 720 285" fill="none" stroke="#a3dc9c" stroke-opacity=".4" stroke-width="2"/>
+<path d="M-20 230 Q360 130 740 230" fill="none" stroke="#ebc767" stroke-opacity=".25" stroke-width="2"/>
+<rect width="720" height="320" fill="url(#fade)"/>
+</svg>
