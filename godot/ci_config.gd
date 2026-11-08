@@ -1,7 +1,7 @@
 @tool
-extends EditorScript
+extends SceneTree
 
-func _run() -> void:
+func _initialize() -> void:
 	var settings = EditorInterface.get_editor_settings()
 	var sdk = OS.get_environment("ANDROID_SDK_ROOT")
 	var java = OS.get_environment("JAVA_HOME")
@@ -11,3 +11,4 @@ func _run() -> void:
 	settings.set_setting("export/android/java_sdk_path", java)
 	settings.save()
 	print("Godot Android export paths configured.")
+	quit()
