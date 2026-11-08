@@ -5,6 +5,11 @@ on:
     paths:
       - 'native-android/**'
       - '.github/workflows/native-android-apk.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'native-android/**'
+      - '.github/workflows/native-android-apk.yml'
   workflow_dispatch:
 jobs:
   build:
