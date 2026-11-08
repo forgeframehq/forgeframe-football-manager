@@ -34,6 +34,15 @@ jobs:
       - name: Import Godot project
         working-directory: godot
         run: godot --headless --path . --editor --quit
+      - name: Install Android SDK 34 for Godot 4.4
+        env:
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+        run: |
+          SDKMANAGER=$(find "$ANDROID_SDK_ROOT/cmdline-tools" -name sdkmanager -type f | head -n 1)
+          echo "sdkmanager: $SDKMANAGER"
+          yes | "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT" --licenses >/dev/null || true
+          "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT" "platform-tools" "build-tools;34.0.0" "platforms;android-34"
+          ls -l "$ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner"
       - name: Configure Godot Android SDK paths
         working-directory: godot
         env:
