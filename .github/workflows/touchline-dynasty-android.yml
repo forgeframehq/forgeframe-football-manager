@@ -34,6 +34,14 @@ jobs:
       - name: Import Godot project
         working-directory: godot
         run: godot --headless --path . --editor --quit
+      - name: Configure Godot Android SDK paths
+        working-directory: godot
+        env:
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+        run: godot --headless --path . --editor --script ci_config.gd
+      - name: Smoke test main scene
+        working-directory: godot
+        run: godot --headless --path . --quit-after 5
       - name: Generate Android signing key
         run: |
           keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" -alias androiddebugkey -storepass android -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US" || true
