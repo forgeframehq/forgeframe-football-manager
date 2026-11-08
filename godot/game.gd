@@ -51,10 +51,10 @@ func _ready() -> void:
 	_redraw()
 
 func _new_game() -> void:
-	world = {"squads": {}, "tables": {}, "season": 2026, "division": 1, "round": 0}
+	world = {"squads": {}, "tables": {}, "season": 2026, "division": 1, "round": 0, "leagues": DIVISIONS.duplicate(true)}
 	for league_index in range(2):
-		for i in range(1, DIVISIONS[league_index].size()):
-			var club: String = DIVISIONS[league_index][i]
+		for i in range(1, world.leagues[league_index].size()):
+			var club: String = world.leagues[league_index][i]
 			var players: Array = []
 			for k in range(POSITIONS.size()):
 				var rating = rng.randi_range(66,83) if league_index == 0 else rng.randi_range(55,73)
@@ -71,14 +71,14 @@ func _new_game() -> void:
 func _reset_standings() -> void:
 	world.tables = {}
 	for d in range(2):
-		for i in range(1,DIVISIONS[d].size()):
-			var name: String = DIVISIONS[d][i]
+		for i in range(1,world.leagues[d].size()):
+			var name: String = world.leagues[d][i]
 			world.tables[name] = {"p":0,"w":0,"d":0,"l":0,"gf":0,"ga":0,"pts":0}
 
 func _build_fixtures() -> void:
 	fixtures = []
 	for d in range(2):
-		var teams = DIVISIONS[d].slice(1)
+		var teams = world.leagues[d].slice(1)
 		var n = teams.size()
 		for r in range(n-1):
 			for k in range(n/2):
@@ -103,6 +103,8 @@ func _load_game() -> void:
 		_new_game()
 		return
 	world = value.world
+	if not world.has("leagues"):
+		world.leagues = DIVISIONS.duplicate(true)
 	state = value.state
 	shortlisted = value.get("shortlisted",[])
 	offers = value.get("offers",[])
@@ -271,6 +273,15 @@ func _redraw() -> void:
 		note.add_child(_label(notification,19,GOLD))
 		notification=""
 
+func _stadium_image() -> void:
+	var art=TextureRect.new()
+	art.texture=load("res://stadium.svg")
+	art.custom_minimum_size=Vector2(688,238)
+	art.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+	art.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	art.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	content.add_child(art)
+
 func _club_selection() -> void:
 	_heading("YOUR LEGACY STARTS HERE","Choose a club in the National Championship. Rise through the divisions.")
 	var banner=_card(content)
@@ -278,8 +289,8 @@ func _club_selection() -> void:
 	v.add_child(_label("2026 / 27  •  SEASON ONE",22,GOLD))
 	v.add_child(_label("TAKE THE TOUCHLINE",44,IVORY,true))
 	v.add_child(_label("Scout. Negotiate. Build a dynasty.",22,MUTED))
-	for i in range(1,DIVISIONS[1].size()):
-		var club=DIVISIONS[1][i]
+	for i in range(1,world.leagues[1].size()):
+		var club=world.leagues[1][i]
 		var p=_card(content)
 		var h=_row(p,14)
 		var icon=_label("✦",37,GOLD)
@@ -312,6 +323,7 @@ func _office() -> void:
 		3: _inbox()
 
 func _office_overview() -> void:
+	_stadium_image()
 	var top=_card(content)
 	var v=_column(top,8)
 	v.add_child(_label("SEASON %d/%02d     •     MATCHDAY %d / 22" % [int(state.year),int(state.year)%100+1,int(state.week)+1],20,GOLD))
@@ -338,7 +350,7 @@ func _office_overview() -> void:
 	var actions=_row(content)
 	for item in [["LEAGUE TABLE",1],["SQUAD",2],["SCOUTING",3]]:
 		var tab=int(item[1])
-		var btn=_button(str(item[0]),func():main_tab=0 if tab==1 else tab-1;sub_tab=1 if tab==1 else 0;_redraw())
+		var btn=_button(str(item[0]),func():main_tab=0 if tab==1 else (3 if tab==3 else 1);sub_tab=1 if tab==1 else 0;_redraw())
 		btn.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		actions.add_child(btn)
 	if state.results.size()>0:
@@ -351,8 +363,8 @@ func _my_table() -> Dictionary:
 
 func _sorted_table() -> Array:
 	var data=[]
-	for i in range(1,DIVISIONS[int(state.division)].size()):
-		var club=DIVISIONS[int(state.division)][i]
+	for i in range(1,world.leagues[int(state.division)].size()):
+		var club=world.leagues[int(state.division)][i]
 		data.append({"name":club,"stats":world.tables.get(club,{})})
 	data.sort_custom(func(a,b):return int(a.stats.pts)>int(b.stats.pts) if a.stats.pts!=b.stats.pts else int(a.stats.gf)-int(a.stats.ga)>int(b.stats.gf)-int(b.stats.ga))
 	return data
@@ -543,7 +555,7 @@ func _pitch_board() -> void:
 		ln.size=Vector2(633,3)
 		field.add_child(ln)
 	var pattern=[1,3,2,4,1]
-	if state.formation=="4-3-3":pattern=[1,3,3,4,1]
+	if state.formation=="4-3-3":pattern=[3,3,4,1]
 	if state.formation=="4-4-2":pattern=[2,4,4,1]
 	var ids=0
 	for row_index in range(pattern.size()):
@@ -553,7 +565,8 @@ func _pitch_board() -> void:
 			var px=40.0+(float(col_index)+0.5)*(610.0/float(number))
 			var py=75.0+float(row_index)*540.0/float(maxi(1,pattern.size()-1))
 			var player=_my_players()[ids]
-			var token=_button("%s\n%d" % [str(player.pos),int(player.ovr)],func():_inspect_player(ids))
+			var player_idx=ids
+			var token=_button("%s\n%d" % [str(player.pos),int(player.ovr)],func():_inspect_player(player_idx))
 			token.size=Vector2(95,69)
 			token.position=Vector2(px-37,py-34)
 			token.add_theme_font_size_override("font_size",20)
@@ -698,6 +711,7 @@ func _club() -> void:
 
 func _club_overview() -> void:
 	_heading("THE CLUB","Build something bigger than football")
+	_stadium_image()
 	var banner=_card(content)
 	var v=_column(banner,10)
 	v.add_child(_label(str(state.club).to_upper(),33,GOLD,true))
@@ -948,11 +962,11 @@ func _finish_season() -> void:
 
 func _swap_division(name:String,to:int) -> void:
 	var from=1-to
-	var old=DIVISIONS[from]
-	var new=DIVISIONS[to]
+	var old=world.leagues[from]
+	var new=world.leagues[to]
 	var idx=old.find(name)
 	if idx==-1:return
 	var replacement=new[new.size()-1]
 	old[idx]=replacement
 	new[new.size()-1]=name
-	# DIVISIONS is a const array; its contained arrays can be changed at runtime.
+	# Career league memberships are stored in the save file.
