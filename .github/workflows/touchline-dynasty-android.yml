@@ -1,0 +1,77 @@
+name: Touchline Dynasty Godot Android APK
+on:
+  push:
+    branches: [touchline-dynasty-godot]
+    paths:
+      - 'godot/**'
+      - '.github/workflows/touchline-dynasty-android.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'godot/**'
+      - '.github/workflows/touchline-dynasty-android.yml'
+  workflow_dispatch:
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Godot 4.4.1 and export templates
+        run: |
+          wget -q https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q Godot_v4.4.1-stable_linux.x86_64.zip
+          chmod +x Godot_v4.4.1-stable_linux.x86_64
+          sudo mv Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+          wget -q https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates/4.4.1.stable
+          unzip -q Godot_v4.4.1-stable_export_templates.tpz
+          cp templates/* ~/.local/share/godot/export_templates/4.4.1.stable/
+          godot --headless --version
+      - name: Import Godot project
+        working-directory: godot
+        run: godot --headless --path . --editor --quit
+      - name: Install Android SDK 34 for Godot 4.4
+        env:
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+        run: |
+          SDKMANAGER=$(find "$ANDROID_SDK_ROOT/cmdline-tools" -name sdkmanager -type f | head -n 1)
+          echo "sdkmanager: $SDKMANAGER"
+          yes | "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT" --licenses >/dev/null || true
+          "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT" "platform-tools" "build-tools;34.0.0" "platforms;android-34"
+          ls -l "$ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner"
+      - name: Configure Godot Android SDK paths
+        working-directory: godot
+        env:
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+        run: timeout 40s godot --headless --path . --editor --script ci_config.gd || [ "$?" -eq 124 ]
+      - name: Smoke test main scene
+        working-directory: godot
+        run: godot --headless --path . --quit-after 5
+      - name: Generate Android signing key
+        run: |
+          keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" -alias androiddebugkey -storepass android -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US" || true
+      - name: Export Android APK
+        working-directory: godot
+        env:
+          ANDROID_HOME: /usr/local/lib/android/sdk
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+          GODOT_ANDROID_KEYSTORE_DEBUG_PATH: /home/runner/.android/debug.keystore
+          GODOT_ANDROID_KEYSTORE_DEBUG_USER: androiddebugkey
+          GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: android
+        run: |
+          echo "Godot export configuration:"
+          grep -n -A 2 -B 2 'export/android' "$HOME/.config/godot/editor_settings-4.tres" || true
+          ls -la "$HOME/.local/share/godot/export_templates/4.4.1.stable/" | head
+          mkdir -p build
+          godot --headless --path . --export-debug Android build/Touchline-Dynasty.apk
+          test -s build/Touchline-Dynasty.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Touchline-Dynasty-Android-APK
+          path: godot/build/Touchline-Dynasty.apk
+          if-no-files-found: error
+          retention-days: 30

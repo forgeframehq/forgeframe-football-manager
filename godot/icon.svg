@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#061a18"/><stop offset=".6" stop-color="#00372a"/><stop offset="1" stop-color="#020d12"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0ab"/><stop offset=".42" stop-color="#d6ac4d"/><stop offset=".8" stop-color="#936229"/><stop offset="1" stop-color="#f4dc85"/></linearGradient>
+<radialGradient id="glow"><stop stop-color="#e8c774" stop-opacity=".23"/><stop offset="1" stop-color="#e8c774" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="512" height="512" rx="104" fill="url(#bg)"/>
+<circle cx="256" cy="227" r="250" fill="url(#glow)"/>
+<path d="M256 42 433 98 423 294Q396 391 256 476 116 391 89 294L79 98Z" fill="#03251f" stroke="url(#gold)" stroke-width="16" stroke-linejoin="round"/>
+<path d="M256 65 411 113 401 293Q373 370 256 449 139 370 111 293L101 113Z" fill="none" stroke="#d4b263" stroke-opacity=".55" stroke-width="3"/>
+<path d="M142 154 Q256 96 370 154" fill="none" stroke="#8ac3a4" stroke-opacity=".44" stroke-width="4"/>
+<circle cx="256" cy="224" r="102" fill="#081915" stroke="url(#gold)" stroke-width="9"/>
+<path d="M256 162 308 195 292 254 224 254 205 195Z" fill="url(#gold)" stroke="#efe0a0" stroke-width="3"/>
+<g fill="none" stroke="#d7be73" stroke-width="7" stroke-linejoin="round">
+<path d="M205 195 164 174M308 195 349 174M224 254 192 305M292 254 320 305M256 162 256 124"/>
+<path d="M164 174 162 257 192 305M349 174 350 257 320 305"/>
+</g>
+<path d="M153 344 Q256 364 359 344" fill="none" stroke="url(#gold)" stroke-width="9" stroke-linecap="round"/>
+<text x="256" y="395" text-anchor="middle" font-family="Georgia,serif" font-size="47" font-weight="bold" fill="#f6e2a0" letter-spacing="7">TD</text>
+</svg>
