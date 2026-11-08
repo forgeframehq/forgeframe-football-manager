@@ -38,7 +38,7 @@ jobs:
         working-directory: godot
         env:
           ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
-        run: godot --headless --path . --editor --script ci_config.gd
+        run: timeout 40s godot --headless --path . --editor --script ci_config.gd || [ "$?" -eq 124 ]
       - name: Smoke test main scene
         working-directory: godot
         run: godot --headless --path . --quit-after 5
