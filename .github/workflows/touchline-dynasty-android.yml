@@ -1,0 +1,54 @@
+name: Touchline Dynasty Godot Android APK
+on:
+  push:
+    branches: [touchline-dynasty-godot]
+    paths:
+      - 'godot/**'
+      - '.github/workflows/touchline-dynasty-android.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'godot/**'
+      - '.github/workflows/touchline-dynasty-android.yml'
+  workflow_dispatch:
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Godot 4.4.1 and export templates
+        run: |
+          wget -q https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q Godot_v4.4.1-stable_linux.x86_64.zip
+          chmod +x Godot_v4.4.1-stable_linux.x86_64
+          sudo mv Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+          wget -q https://github.com/godotengine/godot/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates/4.4.1.stable
+          unzip -q Godot_v4.4.1-stable_export_templates.tpz
+          cp templates/* ~/.local/share/godot/export_templates/4.4.1.stable/
+          godot --headless --version
+      - name: Import Godot project
+        working-directory: godot
+        run: godot --headless --path . --editor --quit
+      - name: Generate Android signing key
+        run: |
+          keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" -alias androiddebugkey -storepass android -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US" || true
+      - name: Export Android APK
+        working-directory: godot
+        env:
+          ANDROID_HOME: /usr/local/lib/android/sdk
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+        run: |
+          mkdir -p build
+          godot --headless --path . --export-debug Android build/Touchline-Dynasty.apk
+          test -s build/Touchline-Dynasty.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Touchline-Dynasty-Android-APK
+          path: godot/build/Touchline-Dynasty.apk
+          if-no-files-found: error
+          retention-days: 30
