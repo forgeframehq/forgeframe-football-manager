@@ -59,7 +59,13 @@ jobs:
         env:
           ANDROID_HOME: /usr/local/lib/android/sdk
           ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+          GODOT_ANDROID_KEYSTORE_DEBUG_PATH: /home/runner/.android/debug.keystore
+          GODOT_ANDROID_KEYSTORE_DEBUG_USER: androiddebugkey
+          GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: android
         run: |
+          echo "Godot export configuration:"
+          grep -n -A 2 -B 2 'export/android' "$HOME/.config/godot/editor_settings-4.tres" || true
+          ls -la "$HOME/.local/share/godot/export_templates/4.4.1.stable/" | head
           mkdir -p build
           godot --headless --path . --export-debug Android build/Touchline-Dynasty.apk
           test -s build/Touchline-Dynasty.apk
